@@ -125,7 +125,7 @@ def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False
 
         if len(data) >= len(data_g):
             idx = np.random.permutation(len(data))
-            disc_score[i] = discriminative_score_metrics(data_scaled[idx[:len(data_g_scaled)]], data_g_scaled, itt, device, device_ids)
+            disc_score[i] = discriminative_score_metrics(data[idx[:len(data_g)]], data_g, itt, device, device_ids)
             if min_max:
                 pred_score[i] = predictive_score_metrics(data_scaled[idx[:len(data_g_scaled)]], data_g_scaled, col_pred, itt, device=device)
             else:
