@@ -91,7 +91,7 @@ def plot_sample_multi(X_data, X_sbts, col=None, x0=1):
     ax[1].tick_params(axis='both', which='major', labelsize=13)
 
 
-def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False, device='cpu', device_ids=[2]):
+def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False, device=torch.device('cpu'), device_ids=[2]):
     """
     Compute discriminative and predictive scores.
     :params ori_data: original data; [np.array]
