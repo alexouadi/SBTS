@@ -17,7 +17,16 @@ class PosthocRNN(nn.Module):
         return x
 
 
-def predictive_score_metrics(ori_data, generated_data, col_pred, iterations=1000, batch_size=128, device='cpu'):
+def predictive_score_metrics(ori_data, generated_data, col_pred, iterations=1000, device=torch.device('cpu')):
+    """
+    Compute the predictive score.
+    :params ori_data: original data; [np.array]
+    :params generated_data: generated data; [np.array]
+    :params col_pred: column to predict; [int]
+    :params iterations: number of iterations during training; [int]
+    :params device: device used during training; [torch.device]
+    return: predictive score; [float]
+    """
     torch.cuda.empty_cache()
     ori_data = torch.tensor(ori_data, dtype=torch.float32).to(device)
     generated_data = torch.tensor(generated_data, dtype=torch.float32).to(device)
@@ -28,6 +37,7 @@ def predictive_score_metrics(ori_data, generated_data, col_pred, iterations=1000
     model = PosthocRNN(dim, hidden_dim).to(device)
     criterion = nn.L1Loss()
     optimizer = optim.Adam(model.parameters())
+    batch_size=128
 
     for _ in range(iterations):
         model.train()

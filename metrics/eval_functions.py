@@ -7,6 +7,13 @@ from discriminative_score import *
 from predictive_score import *
 
 
+def min_max_data(data):
+    m, M = data.min(axis=(0, 1)), data.max(axis=(0, 1))
+    num = data - m
+    den = M - m
+    return num / den
+
+
 def fix_dim(x):
     if x.ndim < 3:
         return x[:, :, np.newaxis]
@@ -14,6 +21,12 @@ def fix_dim(x):
 
 
 def plot_sample(X_data, X_sbts, x0=0):
+    """
+    Plot 4 random univariates samples.
+    :params X_data: original data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params x0: initial value to plot; [float]
+    """
     N = X_data.shape[-1]
     x_d, x_s = np.zeros((X_data.shape[0], N + 1)), np.zeros((X_sbts.shape[0], N + 1))
     x_d[:, 0], x_s[:, 0] = x0, x0
@@ -40,6 +53,13 @@ def plot_sample(X_data, X_sbts, x0=0):
 
 
 def plot_sample_multi(X_data, X_sbts, col=None, x0=1):
+    """
+    Plot 1 random multivariates samples.
+    :params X_data: original data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params col: name of each features; [list]
+    :params x0: initial value to plot; [float]
+    """
     plt.rcParams.update({'font.size': 13})
     fig, ax = plt.subplots(1, 2, figsize=(12, 4))
 
@@ -71,13 +91,30 @@ def plot_sample_multi(X_data, X_sbts, col=None, x0=1):
     ax[1].tick_params(axis='both', which='major', labelsize=13)
 
 
-def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, device='cpu', device_ids=[2]):
+def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False, device='cpu', device_ids=[2]):
+    """
+    Compute discriminative and predictive scores.
+    :params ori_data: original data; [np.array]
+    :params generated_data: generated data; [np.array]
+    :params col_pred: column to predict; [int]
+    :params itt: number of iterations during training; [int]
+    :params n_temp: number of scores to compute; [int]
+    :params min_max: if True, min-max scaling is applied to the data for the predictive score; [bool]
+    :params device: device used during training; [torch.device]
+    :params device_ids: device ids if multiple GPUs,; [list] 
+    return: discriminative and predictive scores; [np.array]
+    """
     X_data, X_sbts = fix_dim(X_data), fix_dim(X_sbts)
     data = torch.tensor(X_data).to(torch.float32).to(device)
     data_g = torch.tensor(X_sbts).to(torch.float32).to(device)
 
+    if min_max:
+        X_data_scaled, X_sbts_scaled = min_max_data(X_data), min_max_data(X_sbts)
+        data_scaled = torch.tensor(X_data_scaled).to(torch.float32).to(device)
+        data_g_scaled = torch.tensor(X_sbts_scaled).to(torch.float32).to(device)
+    
     if col_pred is None:
-        col_pred = data.shape[-1] - 1
+        col_pred = data.shape[-1] - 1  # by default
 
     disc_score, pred_score = np.zeros(n_temp), np.zeros(n_temp)
     st = datetime.datetime.now()
@@ -88,13 +125,19 @@ def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, device='cpu',
 
         if len(data) >= len(data_g):
             idx = np.random.permutation(len(data))
-            disc_score[i] = discriminative_score_metrics(data[idx[:len(data_g)]], data_g, itt, device, device_ids)
-            pred_score[i] = predictive_score_metrics(data[idx[:len(data_g)]], data_g, col_pred, itt, device=device)
+            disc_score[i] = discriminative_score_metrics(data_scaled[idx[:len(data_g_scaled)]], data_g_scaled, itt, device, device_ids)
+            if min_max:
+                pred_score[i] = predictive_score_metrics(data_scaled[idx[:len(data_g_scaled)]], data_g_scaled, col_pred, itt, device=device)
+            else:
+                pred_score[i] = predictive_score_metrics(data[idx[:len(data_g)]], data_g, col_pred, itt, device=device)
 
         else:
             idx = np.random.permutation(len(data_g))
             disc_score[i] = discriminative_score_metrics(data, data_g[idx[:len(data)]], itt, device, device_ids)
-            pred_score[i] = predictive_score_metrics(data, data_g, col_pred, itt, device=device)
+            if min_max:
+                pred_score[i] = predictive_score_metrics(data_scaled, data_g_scaled, col_pred, itt, device=device)
+            else:
+                pred_score[i] = predictive_score_metrics(data, data_g, col_pred, itt, device=device)
 
         if i == 0:
             mm = (time.perf_counter() - time1) * (n_temp - 1) / 60
@@ -110,7 +153,10 @@ def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, device='cpu',
 
 def get_stats(X_data, X_sbts, col=None):
     """
-    Plot 1% and 99% percentiles, mean, and standard deviation for two input arrays
+    Plot 1% and 99% percentiles, mean, and standard deviation for two input arrays.
+    :params X_data: original data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params col: name of each features; [list]
     """
 
     X_data, X_sbts = fix_dim(X_data), fix_dim(X_sbts)

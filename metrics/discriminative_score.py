@@ -6,11 +6,11 @@ from sklearn.metrics import accuracy_score
 
 
 def train_test_divide(data_x, data_x_hat, train_rate=0.8):
-    """Divide train and test data for both original and synthetic data.
-    Args:
-      - data_x: original data
-      - data_x_hat: generated data
-      - train_rate: ratio of training data from the original data
+    """
+    Divide train and test data for both original and synthetic data.
+    :params data_x: original data; [np.array]
+    :params data_x_hat: generated data; [np.array]
+    :params train_rate: ratio of training data from the original data; [float]
     """
     # Divide train / test index (original data)
     no = len(data_x)
@@ -34,14 +34,11 @@ def train_test_divide(data_x, data_x_hat, train_rate=0.8):
 
 
 def batch_generator(data, batch_size):
-    """Mini-batch generator.
-
-    Args:
-      - data: time-series data
-      - batch_size: the number of samples in each batch
-
-    Returns:
-      - X_mb: time-series data in each batch
+    """
+    Mini-batch generator.
+    :params data: original data; [np.array]
+    :params batch_size: number of samples in each batch; [int]
+    Returns: time-series data in each batch; [np.array]
     """
     no = len(data)
     idx = np.random.permutation(no)
@@ -65,7 +62,16 @@ class Discriminator(nn.Module):
         return y_hat_logit, y_hat
 
 
-def discriminative_score_metrics(ori_data, generated_data, iterations, device='cpu', device_ids=[2]):
+def discriminative_score_metrics(ori_data, generated_data, iterations, device=torch.device('cpu'), device_ids=[2]):
+    """
+    Compute the discriminative score.
+    :params ori_data: original data; [np.array]
+    :params generated_data: generated data; [np.array]
+    :params iterations: number of iterations during training; [int]
+    :params device: device used during training; [torch.device]
+    :params device_ids: device ids if multiple GPUs,; [list] 
+    return: discriminative score; [float]
+    """
     ori_data = ori_data.to(device)
     generated_data = generated_data.to(device)
 

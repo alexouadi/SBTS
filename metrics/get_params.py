@@ -7,6 +7,13 @@ from scipy.optimize import minimize
 
 @nb.jit(nopython=True, cache=True)
 def MLE_OU_robust(params, X, dt):
+    """
+    Compute the MLE on Ornstein-Uhlenbeck data.
+    :params params: parameters to estimate; [list]
+    :params X: time series data; [np.array]
+    :params dt: time step; [float]
+    return: negative log-likelihood over X; [float]
+    """
     theta, mu, sigma = params
     N = len(X)
     logL = 0
@@ -24,6 +31,13 @@ def MLE_OU_robust(params, X, dt):
 
 
 def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
+    """
+    Plot the distribution of the estimated parameters on Ornstein-Uhlenbeck data.
+    :params X_data: real data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params dt: time step; [float]
+    :params fix: specified if the real parameters are fixed or not; [bool]
+    """
     params_data = np.zeros((len(X_data), 3))
     for m in range(len(X_data)):
         params_init_data = [1, np.mean(X_data[m]), np.std(X_data[m])]
@@ -97,7 +111,11 @@ def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
 @nb.jit(nopython=True, cache=True)
 def MLE_BS_robust(params, log_returns, dt):
     """
-    Negative log-likelihood function for Black-Scholes model.
+    Compute the MLE on Black-Scholes data.
+    :params params: parameters to estimate; [list]
+    :params log_returns: time series data; [np.array]
+    :params dt: time step; [float]
+    return: negative log-likelihood over X; [float]
     """
     r, sigma = params
 
@@ -112,6 +130,13 @@ def MLE_BS_robust(params, log_returns, dt):
 
 
 def plot_params_distrib_BS(X_data, X_sbts, dt, fix=False):
+    """
+    Plot the distribution of the estimated parameters on Black-Scholes data.
+    :params X_data: real data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params dt: time step; [float]
+    :params fix: specified if the real parameters are fixed or not; [bool]
+    """
     log_returns_data = X_data[:, 1:] - X_data[:, :-1]
     sigma_init = np.std(log_returns_data, axis=1)
     params_data = np.zeros((len(X_data), 2))
@@ -179,7 +204,11 @@ def plot_params_distrib_BS(X_data, X_sbts, dt, fix=False):
 @nb.jit(nopython=True, cache=True)
 def MLE_Heston_robust(params, X, dt):
     """
-    Negative log-likelihood function for Heston Model.
+    Compute the MLE on Heston data.
+    :params params: parameters to estimate; [list]
+    :params X: time series data; [np.array]
+    :params dt: time step; [float]
+    return: negative log-likelihood over X; [float]
     """
     kappa, theta, xi, rho, r = params
     N = len(X)
@@ -218,6 +247,13 @@ def MLE_Heston_robust(params, X, dt):
 
 
 def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
+    """
+    Plot the distribution of the estimated parameters on Black-Scholes data.
+    :params X_data: real data; [np.array]
+    :params X_sbts: generated data; [np.array]
+    :params dt: time step; [float]
+    :params fix: specified if the real parameters are fixed or not; [bool]
+    """
     params_data = np.zeros((len(X_data), 5))
 
     bounds = [

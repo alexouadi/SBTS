@@ -31,8 +31,4 @@ def min_max_data(data):
     m, M = data.min(axis=(0, 1)), data.max(axis=(0, 1))
     num = data - m
     den = M - m
-    return num / den, m, M
-
-
-def invert_min_max(data, m, M):
-    return data * (M - m) + m
+    return num / den

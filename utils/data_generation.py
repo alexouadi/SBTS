@@ -4,16 +4,16 @@ import numpy as np
 class Generate_Data:
     def __init__(self, M):
         """
-        M: number of time series to generate -> [int]
+        :params M: number of time series to generate; [int]
         """
 
         self.M = M
 
     def generate_GARCH(self, N, alpha_0=5, alpha_1=0.4, alpha_2=0.1, s=0.1, x0=0):
         """
-        N: length of time series to generate -> [int] : default = 60
-        s: variance of the noise -> [float] : default = 0.1
-        alpha0, alpha1, alpha2: model parameters : -> [float]
+        :params N: length of time series to generate; [int]
+        :params s: variance of the noise; [float] 
+        :params alpha0, alpha1, alpha2: model parameters; [float]
         """
 
         def simulate():
@@ -38,12 +38,12 @@ class Generate_Data:
 
     def generate_OU(self, theta_range, mu_range, sigma_range, N, dt=1 / 252, x0=1):
         """
-        theta_range: range of theta values -> [list of two ints]
-        sigma_range: range of sigma values -> [list of two ints]
-        mu_range: range of mu values -> [list of two ints]
-        N: time series length -> [int]
-        dt: time step -> [float] : default = 0.01
-        X0: initial value -> [float] : default = 1
+        :params theta_range: range of theta values; [list of two ints]
+        :params sigma_range: range of sigma values; [list of two ints]
+        :params mu_range: range of mu values; [list of two ints]
+        :params N: time series length; [int]
+        :params dt: time step; [float] 
+        :params X0: initial value; [float]
         """
 
         def simulate(theta, mu, sigma):
@@ -62,11 +62,11 @@ class Generate_Data:
 
     def generate_Heston(self, r_range, kappa_range, theta_range, rho_range, xi_range, N, dt=1 / 252, S0=1, v0=1):
         """
-        r/k/theta/pho/xi_range: range of params values -> [list of two ints]
-        N: time series length -> [int]
-        T: terminal time -> [int] : default = 1
-        S0: price initial value -> [float] : default = 1
-        v0: price initial value -> [float] : default = 0
+        :params r/k/theta/pho/xi_range: range of params values; [list of two ints]
+        :params N: time series length; [int]
+        :params T: terminal time; [int]
+        :params S0: price initial value; [float]
+        :params v0: price initial value; [float]
         """
 
         heston = np.zeros((self.M, N + 1, 2))
@@ -101,6 +101,11 @@ class Generate_Data:
         return heston
 
     def generate_sine(self, N, d, x0=0):
+        """
+        :params N: time series length; [int]
+        :params d: time series dimension; [int]
+        :params x0: initial value; [float]
+        """
 
         data = np.zeros((self.M, N + 1, d))
         data[:, 0] = x0
@@ -118,13 +123,11 @@ class Generate_Data:
 
     def generate_AR_multi(self, N, d, phi, sigma, x0=0):
         """
-        Generate sequences from an autoregressive multivariate Gaussian model.
-        Parameters:
-            phi (float): Autoregressive coefficient in [0, 1].
-            sigma (float): Controls the correlation across features, in [-1, 1].
-            d (int): Number of features.
-            N (int): Number of time steps to generate.
-            x0: initial value
+        :params phi: Autoregressive coefficient in [0, 1]; [float]
+        :params sigma: features correlation; [float]
+        :params d: time series dimension; [int]
+        :params N: time series length; [int]
+        :params x0: initial value; [float]
         """
 
         data = np.zeros((self.M, N + 1, d))

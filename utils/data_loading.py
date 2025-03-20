@@ -2,13 +2,9 @@ import numpy as np
 
 
 def MinMaxScaler(data):
-    """Min Max normalizer.
-
-    Args:
-      - data: original data
-
-    Returns:
-      - norm_data: normalized data
+    """
+    :params data: original data; [np.array]
+    Returns: norm_data, normalized data; [np.array]
     """
     min_, max_ = np.min(data, 0), np.max(data, 0)
     numerator = data - min_
@@ -18,13 +14,11 @@ def MinMaxScaler(data):
 
 
 def invert_back(norm_data, max_, min_):
-    """Min Max inverse transform.
-
-    Args:
-      - data: normalized data
-
-    Returns:
-      - norm_data: original data
+    """
+    :params norm_data: normalized data; [np.array]
+    :params max_: maximum value of the original data; [float]
+    :params min_: minimum value of the original data; [float]
+    Returns: original data; [np.array]
     """
     ori_data = norm_data * (max_ - min_)
     ori_data += min_
@@ -32,14 +26,10 @@ def invert_back(norm_data, max_, min_):
 
 
 def real_data_loading(ori_data, seq_len):
-    """Load and preprocess real-world datasets.
-
-    Args:
-      - data_name: stock or energy
-      - seq_len: sequence length
-
-    Returns:
-      - data: preprocessed data.
+    """
+    :params data: original data; [np.array]
+    :params seq_len: sequence length; [int]
+    Returns: preprocessed data; [np.array]
     """
 
     # Flip the data to make chronological data
