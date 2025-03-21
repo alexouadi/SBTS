@@ -51,5 +51,3 @@ jupyter notebook demo_notebook.ipynb
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2503.02943}, 
 }
-
-
