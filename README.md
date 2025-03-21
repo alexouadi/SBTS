@@ -1,6 +1,6 @@
 # 📌 Official Implementation of "Robust Time Series Generation via Schrödinger Bridge: A Comprehensive Evaluation"
 
-This repository contains the official implementation of the paper ["Robust Time Series Generation via Schrödinger Bridge: A Comprehensive Evaluation"](https://arxiv.org/abs/2503.02943) 
+This repository contains the official implementation of the paper ["Robust Time Series Generation via Schrödinger Bridge: A Comprehensive Evaluation"](https://arxiv.org/abs/2503.02943).
 
 Authors: Alexandre Alouadi, Baptiste Barreau, Laurent Carlier, Huyên Pham
 
