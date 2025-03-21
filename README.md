@@ -28,7 +28,7 @@ git clone https://github.com/alexouadi/SBTS.git
 cd SBTS
 ```
 
-To install the necessary dependencies for this project, run:
+To install the necessary dependencies for this project, make sure you use python 3.11 and run:
 ```bash
 pip install -r requirements.txt
 ```
