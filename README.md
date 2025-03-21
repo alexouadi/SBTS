@@ -14,10 +14,10 @@ We investigate the generative capabilities of the Schrödinger Bridge (SB) appro
 ## 📂 Project Structure
 ```
 /SBTS
-│── models                  # Core modules for Schrödinger Bridge-based time series generation
-│── utils.py                # Utility functions
-│── metrics                 # Evaluation metrics as described in the paper
 │── data                    # Real-world datasets used in experiments
+│── metrics                 # Evaluation metrics as described in the paper
+│── models                  # Core modules for Schrödinger Bridge-based time series generation
+│── utils                   # Utility functions
 │── experiments_demo.ipynb  # Example usage and evaluation
 ```
 
