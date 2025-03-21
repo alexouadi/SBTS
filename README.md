@@ -21,10 +21,16 @@ We investigate the generative capabilities of the Schrödinger Bridge (SB) appro
 │── experiments_demo.ipynb  # Example usage and evaluation
 ```
 
-## Clone the repository
+## Setup
+To clone the repository, run:
 ```bash
 git clone https://github.com/alexouadi/SBTS.git
 cd SBTS
+```
+
+To install the necessary dependencies for this project, run:
+```bash
+pip install -r requirements.txt
 ```
 
 ## Usage
