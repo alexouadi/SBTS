@@ -3,6 +3,7 @@
 This repository contains the official implementation of the paper ["Robust Time Series Generation via Schrödinger Bridge: A Comprehensive Evaluation"](https://arxiv.org/abs/2503.02943) 
 
 Authors: Alexandre Alouadi, Baptiste Barreau, Laurent Carlier, Huyên Pham
+
 Contact: alexandre.alouadi@bnpparibas.com; huyen.pham@polytechnique.edu
 
 If you notice any errors or have suggestions for improvement, please feel free to reach out to us.
