@@ -14,7 +14,7 @@ We investigate the generative capabilities of the Schrödinger Bridge (SB) appro
 ## 📂 Project Structure
 ```
 /SBTS
-│── data                    # Real-world datasets used in experiments
+│── data                    # Real-world datasets used in the paper experiments
 │── metrics                 # Evaluation metrics as described in the paper
 │── models                  # Core modules for Schrödinger Bridge-based time series generation
 │── utils                   # Utility functions
