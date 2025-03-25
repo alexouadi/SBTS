@@ -207,8 +207,8 @@ def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
     filtered_params_data = params_data[
         (params_data >= lower_bounds).all(axis=1) & (params_data <= upper_bounds).all(axis=1)]
 
-    lower_bounds_sbts = np.percentile(params_sbts, 3, axis=0)
-    upper_bounds_sbts = np.percentile(params_sbts, 97, axis=0)
+    lower_bounds_sbts = np.percentile(params_sbts, 1, axis=0)
+    upper_bounds_sbts = np.percentile(params_sbts, 99, axis=0)
     filtered_params_sbts = params_sbts[
         (params_sbts >= lower_bounds_sbts).all(axis=1) & (params_sbts <= upper_bounds_sbts).all(axis=1)]
     
