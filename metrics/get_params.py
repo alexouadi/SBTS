@@ -57,7 +57,7 @@ def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
     theta = np.random.uniform(.5, 2.5, 100000)
     mu = np.random.uniform(.5, 1.5, 100000)
     sigma = np.random.uniform(.1, .5, 100000)
-    lines = [1.5, 1., 0.2]
+    lines = [1.5, 1., 0.3]
 
     lower_bounds = np.percentile(params_data, 1, axis=0)
     upper_bounds = np.percentile(params_data, 99, axis=0)
@@ -105,99 +105,6 @@ def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
     axs[2].legend()
 
     fig.tight_layout()
-    plt.show()
-
-
-@nb.jit(nopython=True, cache=True)
-def MLE_BS_robust(params, log_returns, dt):
-    """
-    Compute the MLE on Black-Scholes data.
-    :params params: parameters to estimate; [list]
-    :params log_returns: time series data; [np.array]
-    :params dt: time step; [float]
-    return: negative log-likelihood over X; [float]
-    """
-    r, sigma = params
-
-    logL = 0
-    const = -0.5 * np.log(2 * np.pi * sigma ** 2 * dt)
-    mu = (r - 0.5 * sigma ** 2) * dt
-    den = 2 * sigma ** 2 * dt
-
-    for t in range(len(log_returns)):
-        logL += const - ((log_returns[t] - mu) ** 2) / den
-    return -logL
-
-
-def plot_params_distrib_BS(X_data, X_sbts, dt, fix=False):
-    """
-    Plot the distribution of the estimated parameters on Black-Scholes data.
-    :params X_data: real data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params dt: time step; [float]
-    :params fix: specified if the real parameters are fixed or not; [bool]
-    """
-    log_returns_data = X_data[:, 1:] - X_data[:, :-1]
-    sigma_init = np.std(log_returns_data, axis=1)
-    params_data = np.zeros((len(X_data), 2))
-
-    for m in range(len(X_data)):
-        result_data = minimize(
-            MLE_BS_robust,
-            x0=np.array([.01, sigma_init[m]]),
-            args=(log_returns_data[m], dt),
-            bounds=[(-np.inf, np.inf), (1e-6, np.inf)],
-            method='L-BFGS-B'
-        )
-        params_data[m] = result_data.x
-
-    log_returns_sbts = np.log(X_sbts[:, 1:] / X_sbts[:, :-1])
-    sigma_init = np.std(log_returns_sbts, axis=1)
-    params_sbts = np.zeros((len(X_sbts), 2))
-
-    for m in range(len(X_sbts)):
-        result_sbts = minimize(
-            MLE_BS_robust,
-            x0=np.array([.01, sigma_init[m]]),
-            args=(log_returns_sbts[m], dt),
-            bounds=[(-np.inf, np.inf), (1e-6, np.inf)],
-            method='L-BFGS-B'
-        )
-        params_sbts[m] = result_sbts.x
-
-    r = np.random.uniform(0.03, 0.3, 100000)
-    sigma = np.random.uniform(0.1, 0.3, 100000)
-    lines = [0.03, 0.1]
-
-    fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-
-    # Plot distribution of column 0
-    sns.kdeplot(ax=axs[0], data=params_data[:, 0], shade=True, label='Data')
-    sns.kdeplot(ax=axs[0], data=params_sbts[:, 0], shade=True, label='SBTS')
-    if not fix:
-        sns.kdeplot(ax=axs[0], data=r, shade=True, label='Real')
-    else:
-        line_obj = axs[0].axvline(x=lines[0], color='black', linestyle='--',
-                                  label='Real')
-        axs[0].legend(handles=[line_obj])
-    axs[0].set_title(r'Distribution of params $r$')
-    axs[0].legend()
-
-    # Plot distribution of column 1
-    sns.kdeplot(ax=axs[1], data=params_data[:, 1], shade=True, label='Data')
-    sns.kdeplot(ax=axs[1], data=params_sbts[:, 1], shade=True, label='SBTS')
-    if not fix:
-        sns.kdeplot(ax=axs[1], data=sigma, shade=True, label='Real')
-    else:
-        line_obj = axs[1].axvline(x=lines[1], color='black', linestyle='--',
-                                  label='Real')
-        axs[1].legend(handles=[line_obj])
-
-    axs[1].set_title(r'Distribution of params $\sigma$')
-    axs[1].legend()
-
-    fig.tight_layout()
-
     plt.show()
 
 
@@ -261,7 +168,7 @@ def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
         (1e-6, None),  # theta > 0
         (1e-6, None),  # xi > 0
         (-1, 1),  # rho in [-1, 1]
-        (-1, 1),  # r unrestricted
+        (None, None),  # r unrestricted
     ]
 
     for m in range(len(X_data)):
@@ -285,29 +192,29 @@ def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
         )
         params_sbts[m] = result_sbts.x
 
-    kappa = np.random.uniform(0.5, 1.5, 100000)
-    theta = np.random.uniform(0.7, 1.3, 100000)
+    kappa = np.random.uniform(0.5, 4., 100000)
+    theta = np.random.uniform(0.5, 1.5, 100000)
     xi = np.random.uniform(0.01, 0.9, 100000)
     rho = np.random.uniform(-0.9, 0.9, 100000)
-    r = np.random.uniform(0.01, 0.3, 100000)
+    r = np.random.uniform(0.02, 0.1, 100000)
 
     params_real = [kappa, theta, xi, rho, r]
     labels = [r'$\kappa$', r'$\theta$', r'$\xi$', r'$\rho$', r'$r$']
-    lines = [3., 1., .7, .7, .02]
-
+    lines = [3., 0.02, .7, .7, .02]
+    
     lower_bounds = np.percentile(params_data, 1, axis=0)
     upper_bounds = np.percentile(params_data, 99, axis=0)
     filtered_params_data = params_data[
         (params_data >= lower_bounds).all(axis=1) & (params_data <= upper_bounds).all(axis=1)]
 
-    lower_bounds_sbts = np.percentile(params_sbts, 1, axis=0)
-    upper_bounds_sbts = np.percentile(params_sbts, 99, axis=0)
+    lower_bounds_sbts = np.percentile(params_sbts, 3, axis=0)
+    upper_bounds_sbts = np.percentile(params_sbts, 97, axis=0)
     filtered_params_sbts = params_sbts[
         (params_sbts >= lower_bounds_sbts).all(axis=1) & (params_sbts <= upper_bounds_sbts).all(axis=1)]
-
+    
     fig, axs = plt.subplots(2, 3, figsize=(18, 8))
-
     for i, (param, label, line) in enumerate(zip(params_real, labels, lines)):
+
         sns.kdeplot(ax=axs[i // 3, i % 3], data=filtered_params_data[:, i], shade=True, label='Data')
         sns.kdeplot(ax=axs[i // 3, i % 3], data=filtered_params_sbts[:, i], shade=True, label='SBTS')
         if not fix:
@@ -316,6 +223,8 @@ def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
             line_obj = axs[i // 3, i % 3].axvline(x=line, color='black', linestyle='--',
                                                   label='Real')
             axs[i // 3, i % 3].legend(handles=[line_obj])
+
+            
         axs[i // 3, i % 3].set_title(f'Distribution of param {label}')
         axs[i // 3, i % 3].legend()
 

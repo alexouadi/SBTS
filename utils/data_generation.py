@@ -60,9 +60,9 @@ class Generate_Data:
         sigmas = np.random.uniform(sigma_range[0], sigma_range[1], self.M)
         return np.array([simulate(thetas[i], mus[i], sigmas[i]) for i in range(self.M)])
 
-    def generate_Heston(self, r_range, kappa_range, theta_range, rho_range, xi_range, N, dt=1 / 252, S0=1, v0=1):
+    def generate_Heston(self, r_range, kappa_range, theta_range, rho_range, xi_range, N, dt=1/252, S0=1, v0=1):
         """
-        :params r/k/theta/pho/xi_range: range of params values; [list of two ints]
+        :params r/kappa/theta/rho/xi_range: range of params values; [list of two ints]
         :params N: time series length; [int]
         :params T: terminal time; [int]
         :params S0: price initial value; [float]
