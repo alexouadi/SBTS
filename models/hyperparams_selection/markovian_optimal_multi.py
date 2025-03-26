@@ -24,8 +24,8 @@ def get_last_mark_multi(N, M, d, K, X, x_past, N_pi, h, deltati, itter):
     :params M: number of samples; [int]
     :params d: dimension of the time series; [int]
     :params K: markovian order of X; [int]
-    :params X: samples of shape (M, N+1); [np.array]
-    :params x_past: time series from which we simulate the last point, of shape(N,); [np.array]
+    :params X: samples of shape (M, N+1, d); [np.array]
+    :params x_past: time series from which we simulate the last point, of shape(N, d); [np.array]
     :params N_pi: number of time steps in the Euler scheme; [int]
     :params h: kernel bandwidth; [float]
     :params deltati: time steps between two consecutive observations in the time series; [float]
@@ -55,7 +55,7 @@ def get_last_mark_multi(N, M, d, K, X, x_past, N_pi, h, deltati, itter):
                         weights *= kernel(X[:, ind_ref + j] - last_K[j], h)
                 else:
                     weights /= kernel_oldest
-                # print(i)
+                
                 last_K[:-1] = last_K[1:]
                 last_K[-1] = x_past[i]
 
@@ -115,8 +115,8 @@ def get_optimal_order_multi(N, M, d, K_markov, X, x_past, x_target, N_pi, h, del
     :params M: number of samples in the train set; [int]
     :params d: dimension of the time series; [int]
     :params K_markov: list of markovian order to test: [list]
-    :params X: train samples set of shape (M, N+1); [np.array]
-    :params x_past: test sample set from which we simulate the last points, of shape(len(x_past),N); [np.array]
+    :params X: train samples set of shape (M, N+1, d); [np.array]
+    :params x_past: test sample set from which we simulate the last points, of shape(len(x_past), N, d); [np.array]
     :params x_target: real last point of the test sample set series, of shape(len(x_past),); [np.array]
     :params N_pi: number of time steps in the Euler scheme; [int]
     :params h: list of kernel bandwidth to test; [list]
