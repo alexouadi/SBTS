@@ -59,13 +59,13 @@ def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
     sigma = np.random.uniform(.1, .5, 100000)
     lines = [1.5, 1., 0.3]
 
-    lower_bounds = np.percentile(params_data, 1, axis=0)
-    upper_bounds = np.percentile(params_data, 99, axis=0)
+    lower_bounds = np.percentile(params_data, 3, axis=0)
+    upper_bounds = np.percentile(params_data, 97, axis=0)
     filtered_params_data = params_data[
         (params_data >= lower_bounds).all(axis=1) & (params_data <= upper_bounds).all(axis=1)]
 
-    lower_bounds = np.percentile(params_sbts, 1, axis=0)
-    upper_bounds = np.percentile(params_sbts, 99, axis=0)
+    lower_bounds = np.percentile(params_sbts, 3, axis=0)
+    upper_bounds = np.percentile(params_sbts, 97, axis=0)
     filtered_params_sbts = params_sbts[
         (params_sbts >= lower_bounds).all(axis=1) & (params_sbts <= upper_bounds).all(axis=1)]
 
