@@ -53,11 +53,11 @@ def simulate_kernel_vectorized_mark(N, M, d, K, X, N_pi, h, deltati):
         if i > 0:
             if index_queue >= K:
                 X_oldest = last_K[0]
-                kernel_oldest = kernel(X[:, i] - X_oldest, h)
+                kernel_oldest = kernel(X[:, i - K] - X_oldest, h)
 
                 if np.any(kernel_oldest == 0):
                     weights = np.ones(M)
-                    ind_ref = i - K + 1
+                    ind_ref = i - K
                     for j in range(1, K):
                         weights[:] *= kernel(X[:, ind_ref + j] - last_K[j], h)
                 else:
