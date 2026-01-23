@@ -42,12 +42,14 @@ jupyter notebook demo_notebook.ipynb
 ## Bibtex
 
 ```bibtex
-@misc{alouadi2025robusttimeseriesgeneration,
-      title={Robust time series generation via Schr\"odinger Bridge: a comprehensive evaluation}, 
-      author={Alexandre Alouadi and Baptiste Barreau and Laurent Carlier and Huyên Pham},
-      year={2025},
-      eprint={2503.02943},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2503.02943}, 
-}
+@inproceedings{Alouadi_2025, series={ICAIF ’25},
+   title={Robust time series generation via Schrödinger Bridge: a comprehensive evaluation},
+   url={http://dx.doi.org/10.1145/3768292.3770391},
+   DOI={10.1145/3768292.3770391},
+   booktitle={Proceedings of the 6th ACM International Conference on AI in Finance},
+   publisher={ACM},
+   author={Alouadi, Alexandre and Barreau, Baptiste and Carlier, Laurent and Pham, Huyên},
+   year={2025},
+   month=nov, pages={906–914},
+   collection={ICAIF ’25} }
+
