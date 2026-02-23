@@ -6,27 +6,48 @@ import time
 
 @nb.jit(nopython=True, cache=True)
 def kernel(x, h):
-    """
-    Kernel function used for kernel regression.
-    :params x:; [float]
-    :params h: kernel bandwidth; [float]
-    return: kernel function of shape (len(x),); [np.array]
+    """Quartic compact-support kernel used for weighting neighbors.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Difference values between observations and the current state.
+    h : float
+        Bandwidth parameter.
+
+    Returns
+    -------
+    np.ndarray
+        Kernel weights with the same shape as ``x``.
     """
     return np.where(np.abs(x) < h, (h ** 2 - x ** 2) ** 2, 0)
 
 
 @nb.jit(nopython=True, cache=True)
 def simulate_kernel_mark(N, M, K, X, N_pi, h, deltati):
-    """
-    Simulate 1 univariate time series via the Schrödinger Bridge kernel with markovian series.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples; [int]
-    :params K: markovian order; [int]
-    :params X: samples of shape (M, N+1); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: kernel bandwidth; [float]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    return: 1 time series of shape (N+1,); [np.array]
+    """Simulate one univariate SBTS path with Markovian conditioning.
+
+    Parameters
+    ----------
+    N : int
+        Number of generated transitions; should satisfy ``N = X.shape[1] - 1``.
+    M : int
+        Number of reference trajectories in ``X``.
+    K : int
+        Markov order used in kernel reweighting.
+    X : np.ndarray
+        Reference trajectories with shape ``(M, N+1)``.
+    N_pi : int
+        Number of Euler substeps between two observations.
+    h : float
+        Kernel bandwidth.
+    deltati : float
+        Time interval between consecutive observations.
+
+    Returns
+    -------
+    np.ndarray
+        One generated path of shape ``(N+1,)`` including the initial point.
     """
     # Diffusion calendar
     time_step_Euler = deltati / N_pi
@@ -100,17 +121,19 @@ def simulate_kernel_mark(N, M, K, X, N_pi, h, deltati):
 
 
 def simusbts_mark(N, M, K, X, N_pi, h, deltati, M_simu):
-    """
-    Simulate M_simu univariate time series via the Schrödinger Bridge kernel with markovian seris.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples; [int]
-    :params K: markovian order; [int]
-    :params X: samples of shape (M, N+1); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: kernel bandwidth; [float]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    :params M_simu: number of time series to generate; [int]
-    return: generated time series of shape (M_simu, N); [np.array]
+    """Generate multiple univariate SBTS-Markovian trajectories.
+
+    Parameters
+    ----------
+    N, M, K, X, N_pi, h, deltati :
+        Same meaning as in :func:`simulate_kernel_mark`.
+    M_simu : int
+        Number of trajectories to generate.
+
+    Returns
+    -------
+    np.ndarray
+        Generated data of shape ``(M_simu, N)`` (initial point removed).
     """
     data_sb = np.zeros((M_simu, X.shape[-1]))
     st = datetime.datetime.now()

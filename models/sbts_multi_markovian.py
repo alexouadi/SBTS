@@ -6,11 +6,19 @@ import time
 
 @nb.jit(nopython=True, cache=True)
 def kernel(x, h):
-    """
-    Kernel function used for kernel regression.
-    :params x: array of shape (len(x), d); [float]
-    :params h: kernel bandwidth; [float]
-    return: kernel function of shape (len(x),); [np.array]
+    """Quartic compact-support kernel used for vector-valued inputs.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Difference matrix with shape ``(n_samples, d)``.
+    h : float
+        Bandwidth parameter.
+
+    Returns
+    -------
+    np.ndarray
+        Kernel weights of shape ``(n_samples,)``.
     """
     x_norm = np.sqrt(np.sum(x ** 2, axis=1))
     return np.where(x_norm < h, (h ** 2 - x_norm ** 2) ** 2, 0)
@@ -18,17 +26,31 @@ def kernel(x, h):
 
 @nb.jit(nopython=True, cache=True)
 def simulate_kernel_vectorized_mark(N, M, d, K, X, N_pi, h, deltati):
-    """
-    Simulate 1 univariate time series via the Schrödinger Bridge kernel with markovian series.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples; [int]
-    :params d: dimension of the time series; [int]
-    :params K: markovian order; [int]
-    :params X: samples of shape (M, N+1, d); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: kernel bandwidth; [float]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    return: 1 time series of shape (N+1,d); [np.array]
+    """Simulate one multivariate SBTS path with Markovian conditioning.
+
+    Parameters
+    ----------
+    N : int
+        Number of generated transitions; should satisfy ``N = X.shape[1] - 1``.
+    M : int
+        Number of reference trajectories in ``X``.
+    d : int
+        Feature dimension.
+    K : int
+        Markov order used in kernel reweighting.
+    X : np.ndarray
+        Reference trajectories of shape ``(M, N+1, d)``.
+    N_pi : int
+        Number of Euler substeps per interval.
+    h : float
+        Kernel bandwidth.
+    deltati : float
+        Time interval between consecutive observations.
+
+    Returns
+    -------
+    np.ndarray
+        One generated path with shape ``(N+1, d)`` including the initial point.
     """
     # Diffusion calendar
     time_step_Euler = deltati / N_pi
@@ -106,18 +128,19 @@ def simulate_kernel_vectorized_mark(N, M, d, K, X, N_pi, h, deltati):
 
 
 def simulateSB_multi_mark(N, M, d, K, X, N_pi, h, deltati, M_simu):
-    """
-    Simulate 1 univariate time series via the Schrödinger Bridge kernel with markovian series.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples; [int]
-    :params d: dimension of the time series; [int]
-    :params K: markovian order; [int]
-    :params X: samples of shape (M, N+1, d); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: kernel bandwidth; [float]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    :params M_simu: number of time series to generate; [int]
-    return: generated time series of shape (M_simu, N, d); [np.array]
+    """Generate multiple multivariate SBTS-Markovian trajectories.
+
+    Parameters
+    ----------
+    N, M, d, K, X, N_pi, h, deltati :
+        Same meaning as in :func:`simulate_kernel_vectorized_mark`.
+    M_simu : int
+        Number of trajectories to generate.
+
+    Returns
+    -------
+    np.ndarray
+        Generated data with shape ``(M_simu, N, d)`` (initial point removed).
     """
     data_sb = np.zeros((M_simu, X.shape[1], d))
     st = datetime.datetime.now()

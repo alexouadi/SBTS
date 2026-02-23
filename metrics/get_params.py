@@ -7,12 +7,21 @@ from scipy.optimize import minimize
 
 @nb.jit(nopython=True, cache=True)
 def MLE_OU_robust(params, X, dt):
-    """
-    Compute the MLE on Ornstein-Uhlenbeck data.
-    :params params: parameters to estimate; [list]
-    :params X: time series data; [np.array]
-    :params dt: time step; [float]
-    return: negative log-likelihood over X; [float]
+    """Negative log-likelihood for an Ornstein-Uhlenbeck trajectory.
+
+    Parameters
+    ----------
+    params : np.ndarray
+        Candidate parameters ``[theta, mu, sigma]``.
+    X : np.ndarray
+        One observed trajectory.
+    dt : float
+        Time increment between observations.
+
+    Returns
+    -------
+    float
+        Negative log-likelihood value to minimize.
     """
     theta, mu, sigma = params
     N = len(X)
@@ -31,12 +40,18 @@ def MLE_OU_robust(params, X, dt):
 
 
 def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
-    """
-    Plot the distribution of the estimated parameters on Ornstein-Uhlenbeck data.
-    :params X_data: real data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params dt: time step; [float]
-    :params fix: specified if the real parameters are fixed or not; [bool]
+    """Compare OU parameter distributions between real and generated datasets.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Real trajectories.
+    X_sbts : np.ndarray
+        Generated trajectories.
+    dt : float
+        Time increment used in likelihood estimation.
+    fix : bool, optional
+        If ``True``, plot fixed reference lines instead of sampled reference priors.
     """
     params_data = np.zeros((len(X_data), 3))
     for m in range(len(X_data)):
@@ -110,12 +125,21 @@ def plot_params_distrib_OU(X_data, X_sbts, dt, fix=False):
 
 @nb.jit(nopython=True, cache=True)
 def MLE_Heston_robust(params, X, dt):
-    """
-    Compute the MLE on Heston data.
-    :params params: parameters to estimate; [list]
-    :params X: time series data; [np.array]
-    :params dt: time step; [float]
-    return: negative log-likelihood over X; [float]
+    """Negative log-likelihood for one Heston trajectory.
+
+    Parameters
+    ----------
+    params : np.ndarray
+        Candidate parameters ``[kappa, theta, xi, rho, r]``.
+    X : np.ndarray
+        One trajectory with columns ``[price, variance]``.
+    dt : float
+        Time increment between observations.
+
+    Returns
+    -------
+    float
+        Negative log-likelihood value to minimize.
     """
     kappa, theta, xi, rho, r = params
     N = len(X)
@@ -154,12 +178,18 @@ def MLE_Heston_robust(params, X, dt):
 
 
 def plot_params_distrib_Heston(X_data, X_sbts, dt, fix=False):
-    """
-    Plot the distribution of the estimated parameters on Black-Scholes data.
-    :params X_data: real data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params dt: time step; [float]
-    :params fix: specified if the real parameters are fixed or not; [bool]
+    """Compare Heston parameter distributions between real and generated datasets.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Real trajectories.
+    X_sbts : np.ndarray
+        Generated trajectories.
+    dt : float
+        Time increment used in likelihood estimation.
+    fix : bool, optional
+        If ``True``, plot fixed reference lines instead of sampled reference priors.
     """
     params_data = np.zeros((len(X_data), 5))
 
