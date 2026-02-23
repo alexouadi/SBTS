@@ -8,6 +8,18 @@ from predictive_score import *
 
 
 def min_max_data(data):
+    """Apply feature-wise min-max scaling across batch and time axes.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Input array with shape ``(batch, time, features)``.
+
+    Returns
+    -------
+    np.ndarray
+        Scaled array in ``[0, 1]`` per feature.
+    """
     m, M = data.min(axis=(0, 1)), data.max(axis=(0, 1))
     num = data - m
     den = M - m
@@ -15,17 +27,23 @@ def min_max_data(data):
 
 
 def fix_dim(x):
+    """Ensure input data has three dimensions: ``(batch, time, features)``."""
     if x.ndim < 3:
         return x[:, :, np.newaxis]
     return x
 
 
 def plot_sample(X_data, X_sbts, x0=0):
-    """
-    Plot 4 random univariates samples.
-    :params X_data: original data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params x0: initial value to plot; [float]
+    """Plot random univariate trajectories from real and generated datasets.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Original data with shape ``(M, N)``.
+    X_sbts : np.ndarray
+        Generated data with shape ``(M_simu, N)``.
+    x0 : float, optional
+        Initial value prepended for display.
     """
     N = X_data.shape[-1]
     x_d, x_s = np.zeros((X_data.shape[0], N + 1)), np.zeros((X_sbts.shape[0], N + 1))
@@ -53,12 +71,18 @@ def plot_sample(X_data, X_sbts, x0=0):
 
 
 def plot_sample_multi(X_data, X_sbts, col=None, x0=1):
-    """
-    Plot 1 random multivariates samples.
-    :params X_data: original data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params col: name of each features; [list]
-    :params x0: initial value to plot; [float]
+    """Plot one random multivariate trajectory from each dataset.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Original data with shape ``(M, N, d)``.
+    X_sbts : np.ndarray
+        Generated data with shape ``(M_simu, N, d)``.
+    col : list[str] | None, optional
+        Feature names used in the legend.
+    x0 : float, optional
+        Initial value prepended for display.
     """
     plt.rcParams.update({'font.size': 13})
     fig, ax = plt.subplots(1, 2, figsize=(12, 4))
@@ -92,17 +116,31 @@ def plot_sample_multi(X_data, X_sbts, col=None, x0=1):
 
 
 def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False, device=torch.device('cpu'), device_ids=[2]):
-    """
-    Compute discriminative and predictive scores.
-    :params ori_data: original data; [np.array]
-    :params generated_data: generated data; [np.array]
-    :params col_pred: column to predict; [int]
-    :params itt: number of iterations during training; [int]
-    :params n_temp: number of scores to compute; [int]
-    :params min_max: if True, min-max scaling is applied to the data for the predictive score; [bool]
-    :params device: device used during training; [torch.device]
-    :params device_ids: device ids if multiple GPUs,; [list] 
-    return: discriminative and predictive scores; [np.array]
+    """Compute discriminative and predictive metrics used in the notebook demo.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Original dataset.
+    X_sbts : np.ndarray
+        Generated dataset.
+    col_pred : int | None, optional
+        Feature index used as the prediction target. Defaults to the last feature.
+    itt : int, optional
+        Training iterations per metric run.
+    n_temp : int, optional
+        Number of repeated evaluations.
+    min_max : bool, optional
+        If ``True``, apply min-max scaling before predictive scoring.
+    device : torch.device, optional
+        Device used during model training.
+    device_ids : list[int], optional
+        GPU IDs for discriminative score when using multi-GPU setups.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Discriminative scores and predictive scores, each of length ``n_temp``.
     """
     X_data, X_sbts = fix_dim(X_data), fix_dim(X_sbts)
     data = torch.tensor(X_data).to(torch.float32).to(device)
@@ -152,11 +190,21 @@ def get_scores(X_data, X_sbts, col_pred=None, itt=2000, n_temp=10, min_max=False
 
 
 def get_stats(X_data, X_sbts, col=None):
-    """
-    Plot 1% and 99% percentiles, mean, and standard deviation for two input arrays.
-    :params X_data: original data; [np.array]
-    :params X_sbts: generated data; [np.array]
-    :params col: name of each features; [list]
+    """Summarize distributional statistics for real vs generated data.
+
+    Parameters
+    ----------
+    X_data : np.ndarray
+        Original dataset.
+    X_sbts : np.ndarray
+        Generated dataset.
+    col : list[str] | None, optional
+        Feature names used as index labels.
+
+    Returns
+    -------
+    pd.DataFrame
+        Table containing percentiles, mean, standard deviation, min and max.
     """
 
     X_data, X_sbts = fix_dim(X_data), fix_dim(X_sbts)
