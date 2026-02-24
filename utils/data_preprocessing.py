@@ -3,12 +3,25 @@ import numpy as np
 
 
 def fix_dim(x):
+    """Ensure data has shape ``(batch, time, features)``."""
     if x.ndim < 3:
         return x[:, :, np.newaxis]
     return x
 
 
 def normalize_data(data):
+    """Standardize features with ``StandardScaler`` across batch and time.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Input time-series array.
+
+    Returns
+    -------
+    tuple[np.ndarray, StandardScaler]
+        Normalized data and fitted scaler.
+    """
     data = fix_dim(data)
     M, L, N = data.shape
     data_reshaped = data.reshape((M * L, N))  # Reshape to (ML, N)
@@ -19,6 +32,7 @@ def normalize_data(data):
 
 
 def invert_normalization(normalized_data, scaler):
+    """Invert standardization produced by :func:`normalize_data`."""
     normalized_data = fix_dim(normalized_data)
     M, L, N = normalized_data.shape
     normalized_data_reshaped = normalized_data.reshape((M * L, N))
@@ -28,6 +42,7 @@ def invert_normalization(normalized_data, scaler):
 
 
 def min_max_data(data):
+    """Apply feature-wise min-max scaling over batch and time axes."""
     m, M = data.min(axis=(0, 1)), data.max(axis=(0, 1))
     num = data - m
     den = M - m

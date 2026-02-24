@@ -6,6 +6,15 @@ from sklearn.metrics import mean_absolute_error
 
 
 class PosthocRNN(nn.Module):
+    """GRU regressor used to compute the predictive score metric.
+
+    Parameters
+    ----------
+    input_dim : int
+        Number of input features including the target placeholder convention.
+    hidden_dim : int
+        Hidden size of the GRU encoder.
+    """
     def __init__(self, input_dim, hidden_dim):
         super(PosthocRNN, self).__init__()
         self.rnn = nn.GRU(input_size=input_dim - 1, hidden_size=hidden_dim, batch_first=True)
@@ -18,14 +27,25 @@ class PosthocRNN(nn.Module):
 
 
 def predictive_score_metrics(ori_data, generated_data, col_pred, iterations=1000, device=torch.device('cpu')):
-    """
-    Compute the predictive score.
-    :params ori_data: original data; [np.array]
-    :params generated_data: generated data; [np.array]
-    :params col_pred: column to predict; [int]
-    :params iterations: number of iterations during training; [int]
-    :params device: device used during training; [torch.device]
-    return: predictive score; [float]
+    """Compute the post-hoc predictive score between real and synthetic sequences.
+
+    Parameters
+    ----------
+    ori_data : np.ndarray | torch.Tensor
+        Real time-series data with shape ``(batch, seq_len, dim)``.
+    generated_data : np.ndarray | torch.Tensor
+        Synthetic time-series data with shape ``(batch, seq_len, dim)``.
+    col_pred : int
+        Index of the feature to predict at the next step.
+    iterations : int, optional
+        Number of training iterations for the GRU regressor.
+    device : torch.device, optional
+        Device used for training and evaluation.
+
+    Returns
+    -------
+    float
+        Mean absolute prediction error over the real dataset.
     """
     torch.cuda.empty_cache()
     ori_data = torch.tensor(ori_data, dtype=torch.float32).to(device)

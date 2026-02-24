@@ -6,11 +6,21 @@ from sklearn.metrics import accuracy_score
 
 
 def train_test_divide(data_x, data_x_hat, train_rate=0.8):
-    """
-    Divide train and test data for both original and synthetic data.
-    :params data_x: original data; [np.array]
-    :params data_x_hat: generated data; [np.array]
-    :params train_rate: ratio of training data from the original data; [float]
+    """Split real and synthetic datasets into train and test partitions.
+
+    Parameters
+    ----------
+    data_x : np.ndarray | torch.Tensor
+        Real sequences of shape ``(batch, seq_len, dim)``.
+    data_x_hat : np.ndarray | torch.Tensor
+        Synthetic sequences of shape ``(batch, seq_len, dim)``.
+    train_rate : float, optional
+        Fraction of samples assigned to the training split.
+
+    Returns
+    -------
+    tuple
+        ``(train_x, train_x_hat, test_x, test_x_hat)``.
     """
     # Divide train / test index (original data)
     no = len(data_x)
@@ -34,11 +44,19 @@ def train_test_divide(data_x, data_x_hat, train_rate=0.8):
 
 
 def batch_generator(data, batch_size):
-    """
-    Mini-batch generator.
-    :params data: original data; [np.array]
-    :params batch_size: number of samples in each batch; [int]
-    Returns: time-series data in each batch; [np.array]
+    """Sample a random mini-batch from a sequence dataset.
+
+    Parameters
+    ----------
+    data : np.ndarray | torch.Tensor
+        Input sequences.
+    batch_size : int
+        Number of sampled trajectories.
+
+    Returns
+    -------
+    np.ndarray | torch.Tensor
+        Batch with shape ``(batch_size, seq_len, dim)``.
     """
     no = len(data)
     idx = np.random.permutation(no)
@@ -50,6 +68,8 @@ def batch_generator(data, batch_size):
 
 
 class Discriminator(nn.Module):
+    """GRU-based discriminator used in the discriminative score metric."""
+
     def __init__(self, input_size, hidden_size, num_layers):
         super().__init__()
         self.RNN = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
@@ -63,14 +83,25 @@ class Discriminator(nn.Module):
 
 
 def discriminative_score_metrics(ori_data, generated_data, iterations, device=torch.device('cpu'), device_ids=[2]):
-    """
-    Compute the discriminative score.
-    :params ori_data: original data; [np.array]
-    :params generated_data: generated data; [np.array]
-    :params iterations: number of iterations during training; [int]
-    :params device: device used during training; [torch.device]
-    :params device_ids: device ids if multiple GPUs,; [list] 
-    return: discriminative score; [float]
+    """Compute the discriminative score between real and synthetic data.
+
+    Parameters
+    ----------
+    ori_data : torch.Tensor
+        Real sequences with shape ``(batch, seq_len, dim)``.
+    generated_data : torch.Tensor
+        Synthetic sequences with shape ``(batch, seq_len, dim)``.
+    iterations : int
+        Number of discriminator optimization steps.
+    device : torch.device, optional
+        Device used for training and inference.
+    device_ids : list[int], optional
+        GPU IDs used by ``torch.nn.DataParallel``.
+
+    Returns
+    -------
+    float
+        Absolute distance between discriminator accuracy and random-guess level (0.5).
     """
     ori_data = ori_data.to(device)
     generated_data = generated_data.to(device)

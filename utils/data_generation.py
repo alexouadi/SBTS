@@ -3,17 +3,34 @@ import numpy as np
 
 class Generate_Data:
     def __init__(self, M):
-        """
-        :params M: number of time series to generate; [int]
+        """Initialize a synthetic time-series generator.
+
+        Parameters
+        ----------
+        M : int
+            Number of trajectories to generate for each simulation call.
         """
 
         self.M = M
 
     def generate_GARCH(self, N, alpha_0=5, alpha_1=0.4, alpha_2=0.1, s=0.1, x0=0):
-        """
-        :params N: length of time series to generate; [int]
-        :params s: variance of the noise; [float] 
-        :params alpha0, alpha1, alpha2: model parameters; [float]
+        """Generate ``M`` univariate GARCH-like trajectories.
+
+        Parameters
+        ----------
+        N : int
+            Number of returned time steps after the initial value.
+        alpha_0, alpha_1, alpha_2 : float, optional
+            Volatility recursion coefficients.
+        s : float, optional
+            Standard deviation multiplier of the Gaussian innovation.
+        x0 : float, optional
+            Initial value inserted at index 0.
+
+        Returns
+        -------
+        np.ndarray
+            Array with shape ``(M, N+1)``.
         """
 
         def simulate():
@@ -37,13 +54,23 @@ class Generate_Data:
         return X_garch
 
     def generate_OU(self, theta_range, mu_range, sigma_range, N, dt=1 / 252, x0=1):
-        """
-        :params theta_range: range of theta values; [list of two ints]
-        :params sigma_range: range of sigma values; [list of two ints]
-        :params mu_range: range of mu values; [list of two ints]
-        :params N: time series length; [int]
-        :params dt: time step; [float] 
-        :params X0: initial value; [float]
+        """Generate ``M`` Ornstein-Uhlenbeck trajectories.
+
+        Parameters
+        ----------
+        theta_range, mu_range, sigma_range : list[float]
+            Two-value ranges ``[low, high]`` sampled uniformly per trajectory.
+        N : int
+            Number of returned time steps after the initial value.
+        dt : float, optional
+            Time increment between consecutive points.
+        x0 : float, optional
+            Initial state at index 0.
+
+        Returns
+        -------
+        np.ndarray
+            Simulated series of shape ``(M, N+1)``.
         """
 
         def simulate(theta, mu, sigma):
@@ -61,12 +88,27 @@ class Generate_Data:
         return np.array([simulate(thetas[i], mus[i], sigmas[i]) for i in range(self.M)])
 
     def generate_Heston(self, r_range, kappa_range, theta_range, rho_range, xi_range, N, dt=1/252, S0=1, v0=1):
-        """
-        :params r/kappa/theta/rho/xi_range: range of params values; [list of two ints]
-        :params N: time series length; [int]
-        :params T: terminal time; [int]
-        :params S0: price initial value; [float]
-        :params v0: price initial value; [float]
+        """Generate ``M`` two-dimensional Heston trajectories.
+
+        The output contains price and variance/volatility channels.
+
+        Parameters
+        ----------
+        r_range, kappa_range, theta_range, rho_range, xi_range : list[float]
+            Two-value ranges ``[low, high]`` used to draw one parameter set per path.
+        N : int
+            Number of returned time steps after the initial value.
+        dt : float, optional
+            Time increment between points.
+        S0 : float, optional
+            Initial price.
+        v0 : float, optional
+            Initial variance state.
+
+        Returns
+        -------
+        np.ndarray
+            Array of shape ``(M, N+1, 2)`` where last dimension is ``[price, vol]``.
         """
 
         heston = np.zeros((self.M, N + 1, 2))
@@ -101,10 +143,21 @@ class Generate_Data:
         return heston
 
     def generate_sine(self, N, d, x0=0):
-        """
-        :params N: time series length; [int]
-        :params d: time series dimension; [int]
-        :params x0: initial value; [float]
+        """Generate ``M`` bounded multi-dimensional sinusoidal trajectories.
+
+        Parameters
+        ----------
+        N : int
+            Number of returned time steps after the initial value.
+        d : int
+            Number of features per trajectory.
+        x0 : float, optional
+            Initial value for every feature.
+
+        Returns
+        -------
+        np.ndarray
+            Array with shape ``(M, N+1, d)``.
         """
 
         data = np.zeros((self.M, N + 1, d))
@@ -122,12 +175,25 @@ class Generate_Data:
         return data
 
     def generate_AR_multi(self, N, d, phi, sigma, x0=0):
-        """
-        :params phi: Autoregressive coefficient in [0, 1]; [float]
-        :params sigma: features correlation; [float]
-        :params d: time series dimension; [int]
-        :params N: time series length; [int]
-        :params x0: initial value; [float]
+        """Generate ``M`` correlated multivariate AR(1) trajectories.
+
+        Parameters
+        ----------
+        N : int
+            Number of returned time steps after the initial value.
+        d : int
+            Number of features.
+        phi : float
+            AR(1) coefficient.
+        sigma : float
+            Off-diagonal correlation level used to build the innovation covariance.
+        x0 : float, optional
+            Initial value for every feature.
+
+        Returns
+        -------
+        np.ndarray
+            Simulated series with shape ``(M, N+1, d)``.
         """
 
         data = np.zeros((self.M, N + 1, d))

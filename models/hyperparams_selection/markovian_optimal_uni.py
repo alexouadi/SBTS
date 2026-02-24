@@ -6,29 +6,40 @@ import time
 
 @nb.jit(nopython=True, cache=True)
 def kernel(x, h):
-    """
-    Kernel function used for kernel regression.
-    :params x:; [float]
-    :params h: kernel bandwidth; [float]
-    return: kernel function of shape (len(x),); [np.array]
+    """Quartic compact-support kernel used for weighting neighbors.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Difference values between observations and the current state.
+    h : float
+        Kernel bandwidth.
+
+    Returns
+    -------
+    np.ndarray
+        Kernel weights with the same shape as ``x``.
     """
     return np.where(np.abs(x) < h, (h ** 2 - x ** 2) ** 2, 0)
 
 
 @nb.jit(nopython=True, cache=True)
 def get_last_mark(N, M, K, X, x_past, N_pi, h, deltati, itter):
-    """
-    Simulate the last point of a given time series via the Schrödinger Bridge kernel using markovian series.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples; [int]
-    :params K: markovian order of X; [int]
-    :params X: samples of shape (M, N+1); [np.array]
-    :params x_past: time series from which we simulate the last point, of shape(N,); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: kernel bandwidth; [float]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    :params itter: number of path to generate; [int]
-    return: mean of all last points generated; [float]
+    """Estimate the next point of one univariate path with Markovian SBTS.
+
+    Parameters
+    ----------
+    N, M, K, X, N_pi, h, deltati :
+        SBTS and kernel settings, with ``X`` of shape ``(M, N+1)``.
+    x_past : np.ndarray
+        Observed past trajectory of shape ``(N,)``.
+    itter : int
+        Number of Monte Carlo bridge paths used for averaging.
+
+    Returns
+    -------
+    float
+        Mean predicted last value over sampled bridge paths.
     """
     # Diffusion calendar
     time_step_Euler = deltati / N_pi
@@ -102,19 +113,27 @@ def get_last_mark(N, M, K, X, x_past, N_pi, h, deltati, itter):
 
 
 def get_optimal_order(N, M, K_markov, X, x_past, x_target, N_pi, h, deltati, itter=50):
-    """
-    Simulate the last points of a given test via the Schrödinger Bridge kernel using markovian series.
-    :params N: number of time steps to generate, must be equal to (X.shape[1] - 1); [int]
-    :params M: number of samples in the train set; [int]
-    :params K_markov: list of markovian order to test: [list]
-    :params X: train samples set of shape (M, N+1); [np.array]
-    :params x_past: test sample set from which we simulate the last points, of shape(len(x_past),N); [np.array]
-    :params x_target: real last point of the test sample set series, of shape(len(x_past),); [np.array]
-    :params N_pi: number of time steps in the Euler scheme; [int]
-    :params h: list of kernel bandwidth to test; [list]
-    :params deltati: time steps between two consecutive observations in the time series; [float]
-    :params itter: number of path to generate; [int]
-    return: the best windows found for all the h, along with their respective mse; [np.array, np.array]
+    """Search the best Markov order for multiple bandwidth values (univariate case).
+
+    Parameters
+    ----------
+    N, M, X, N_pi, deltati :
+        SBTS settings, with ``X`` of shape ``(M, N+1)``.
+    K_markov : list[int]
+        Candidate Markov orders.
+    x_past : np.ndarray
+        Test past sequences with shape ``(n_test, N)``.
+    x_target : np.ndarray
+        True next values with shape ``(n_test,)``.
+    h : list[float]
+        Candidate kernel bandwidths.
+    itter : int, optional
+        Number of bridge paths per prediction.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Ranked windows and associated MSE table (scaled by 100).
     """
     M_test = len(x_past)
     windows, mse_res = np.zeros((len(h), len(K_markov))), np.zeros((len(h), len(K_markov)))
