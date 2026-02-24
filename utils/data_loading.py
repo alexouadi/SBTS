@@ -2,9 +2,17 @@ import numpy as np
 
 
 def MinMaxScaler(data):
-    """
-    :params data: original data; [np.array]
-    Returns: norm_data, normalized data; [np.array]
+    """Apply feature-wise min-max scaling.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Input array.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        Normalized data, per-feature maxima, and per-feature minima.
     """
     min_, max_ = np.min(data, 0), np.max(data, 0)
     numerator = data - min_
@@ -14,11 +22,21 @@ def MinMaxScaler(data):
 
 
 def invert_back(norm_data, max_, min_):
-    """
-    :params norm_data: normalized data; [np.array]
-    :params max_: maximum value of the original data; [float]
-    :params min_: minimum value of the original data; [float]
-    Returns: original data; [np.array]
+    """Invert min-max normalization.
+
+    Parameters
+    ----------
+    norm_data : np.ndarray
+        Min-max normalized array.
+    max_ : np.ndarray
+        Per-feature maxima used during normalization.
+    min_ : np.ndarray
+        Per-feature minima used during normalization.
+
+    Returns
+    -------
+    np.ndarray
+        Data mapped back to the original scale.
     """
     ori_data = norm_data * (max_ - min_)
     ori_data += min_
@@ -26,10 +44,19 @@ def invert_back(norm_data, max_, min_):
 
 
 def real_data_loading(ori_data, seq_len):
-    """
-    :params data: original data; [np.array]
-    :params seq_len: sequence length; [int]
-    Returns: preprocessed data; [np.array]
+    """Prepare chronological windowed sequences from raw tabular time series.
+
+    Parameters
+    ----------
+    ori_data : np.ndarray
+        Raw data with shape ``(time, features)``.
+    seq_len : int
+        Sliding-window sequence length.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        Shuffled windows of shape ``(n_windows, seq_len, features)``, maxima, and minima.
     """
 
     # Flip the data to make chronological data
