@@ -1,1 +1,0 @@
-sbts_plugin

@@ -1,2 +1,0 @@
-[ts_benchmark.models]
-sbts = sbts_plugin.contract:build_estimator
