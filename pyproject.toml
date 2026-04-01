@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbts-plugin"
+version = "0.1.0"
+description = "SBTS model plugin for ts-benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "numba>=0.59",
+]
+
+[project.entry-points."ts_benchmark.models"]
+sbts = "sbts_plugin.contract:build_estimator"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sbts_plugin = ["ts_benchmark_plugin.toml"]

@@ -1,0 +1,69 @@
+[manifest]
+display_name = "SBTS"
+version = "0.1.0"
+family = "kernel"
+description = "SBTS time-series generator."
+runtime_device_hints = ["cpu"]
+supported_dataset_sources = ["synthetic", "csv", "parquet"]
+required_input = "returns"
+default_pipeline = "minmax"
+tags = ["sbts", "kernel", "plugin"]
+notes = "Supports unconditional generation and forecast sampling through the benchmark structural contract."
+
+[manifest.capabilities]
+multivariate = true
+probabilistic_sampling = true
+benchmark_protocol_contract = true
+explicit_preprocessing = true
+uses_benchmark_device = false
+
+[parameters]
+name = "sbts"
+
+[[parameters.fields]]
+name = "h"
+value_type = "float"
+required = false
+default = 0.2
+annotation = "float"
+description = "Kernel bandwidth."
+
+[[parameters.fields]]
+name = "N_pi"
+value_type = "int"
+required = false
+default = 100
+annotation = "int"
+description = "Euler substeps per interval."
+
+[[parameters.fields]]
+name = "deltati"
+value_type = "float"
+required = false
+default = 1.0
+annotation = "float"
+description = "Time interval between consecutive observations."
+
+[[parameters.fields]]
+name = "markov_order"
+value_type = "int"
+required = false
+default = 1
+annotation = "int"
+description = "Markov order for the Markovian SBTS variant."
+
+[[parameters.fields]]
+name = "unconditional_variant"
+value_type = "string"
+required = false
+default = "standard"
+choices = ["standard", "markovian"]
+annotation = "str"
+description = "Unconditional sampler variant."
+
+[[parameters.fields]]
+name = "random_seed"
+value_type = "int"
+required = false
+annotation = "int | None"
+description = "Optional random seed recorded with the fitted generator."
