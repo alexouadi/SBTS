@@ -4,7 +4,7 @@ This repository contains the official implementation of the paper: [Robust Time 
 
 Authors: Alexandre Alouadi, Baptiste Barreau, Laurent Carlier, Huyên Pham
 
-Contact: alexandre.alouadi@bnpparibas.com; huyen.pham@polytechnique.edu
+Contact: alexandre.alouadi@gmail.com; huyen.pham@polytechnique.edu
 
 If you notice any errors or have suggestions for improvement, please feel free to reach out to us.
 
